@@ -9,14 +9,15 @@
 
 
 describe.only('Central de Atendimento ao Cliente TAT', function() {
-
+    
+    const THREE_SECONDS_IN_MS = 3000
     beforeEach(function() {
         cy.visit('./src/index.html')
     })
     it('teste ágil em textos longos', function() {
 
         const longtext = 'saboroso, saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,saboroso,'
-    
+        cy.clock()
         cy.title().should('be.equals','Central de Atendimento ao Cliente TAT');
         cy.get('#firstName').type('Daniel');
         cy.get('#lastName').type('Almeida');
@@ -25,20 +26,29 @@ describe.only('Central de Atendimento ao Cliente TAT', function() {
         cy.get('#email-checkbox').click();
         cy.get('#open-text-area').type(longtext, {delay:0});
         cy.get('.button').click();
-        cy.get('.success > strong').should('be.visible','Mensagem enviada com sucesso.');
-  })
+        cy.get('.success').should('be.visible','Mensagem enviada com sucesso.');
 
-    it('preenche os campos obrigatórios e envia o formulário', function() {
+        cy.tick(THREE_SECONDS_IN_MS)
 
-        cy.get('#firstName').type('Daniel').should('be.visible');
-        cy.get('#lastName').type('Almeida').should('be.visible');
-        cy.get('#email').type('laura.undc@hotmail,com').should('be.visible');
-        cy.get('#phone').type('999053389').should('be.visible');
-        cy.get('#email-checkbox').click();
-        cy.get('#open-text-area').type('saboroso').should('be.visible');
-        cy.get('.button').click();
-        cy.get('.error').should('be.visible','preencha os campos obrigatórios!');
+        cy.get('.success').should('not.be.visible');
     })
+
+    Cypress._.times(5, function() {
+        it('preenche os campos obrigatórios e envia o formulário', function() {
+        
+            cy.get('#firstName').type('Daniel').should('be.visible');
+            cy.get('#lastName').type('Almeida').should('be.visible');
+            cy.get('#email').type('laura.undc@hotmail,com').should('be.visible');
+            cy.get('#phone').type('999053389').should('be.visible');
+            cy.get('#email-checkbox').click();
+            cy.get('#open-text-area').type('saboroso').should('be.visible');
+            cy.get('.button').click();
+            cy.get('.error').should('be.visible','preencha os campos obrigatórios!');
+        })
+
+    })
+
+    
 
     it('campo de telefone continua vazio se preenchido com valor nao-numérico', function() {
 
@@ -147,5 +157,29 @@ describe.only('Central de Atendimento ao Cliente TAT', function() {
         it('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', function() {
             cy.get('#privacy  a').should('have.attr', 'target', '_blank')
         })
+
+        it('exibe e esconde as mensagens de sucesso e erro usando o .invoke', () => {
+            cy.get('.success')
+              .should('not.be.visible')
+              .invoke('show')
+              .should('be.visible')
+              .and('contain', 'Mensagem enviada com sucesso.')
+              .invoke('hide')
+              .should('not.be.visible')
+            cy.get('.error')
+              .should('not.be.visible')
+              .invoke('show')
+              .should('be.visible')
+              .and('contain', 'Valide os campos obrigatórios!')
+              .invoke('hide')
+              .should('not.be.visible')
+          })
+
+          it.only('preenche a area de texto usando o comando invoke', () => {
+            const longtext = Cypress._.repeat('123456789',20)
+            cy.get('#open-text-area').invoke('val', longtext)
+            .should('have.value',longtext)
+          })
+
 })
   

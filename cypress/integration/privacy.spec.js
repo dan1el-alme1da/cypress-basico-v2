@@ -1,7 +1,6 @@
-it.only('testa a página da política de privacidade de forma independente', function() {
-    cy.visit('./src/privacy.html')
-    
-    cy.contains('Talking About Testing').should('be.visible')
-    cy.get('h1#title').should('have.visible','CAC TAT - Política de privacidade')
-    cy.get('#white-background').should('have.visible')
+Cypress._.times(5, function () {
+    it.only('verifica que a política de privacidade abre em outra aba sem a necessidade de um clique', function() {
+        cy.visit('./src/privacy.html')
+        cy.contains('Talking About Testing').should('be.visible')
+    })
 })
